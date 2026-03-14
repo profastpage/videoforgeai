@@ -126,7 +126,9 @@ export async function createVideoGeneration(
     completedAt: null,
   });
 
-  const provider = getVideoProvider();
+  const provider = session.user.role === "admin"
+    ? getVideoProvider()
+    : getVideoProvider("mock");
   const job = await provider.createGeneration({
     ...parsedInput,
     generationId: generation.id,

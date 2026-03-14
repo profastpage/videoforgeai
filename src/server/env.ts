@@ -13,6 +13,21 @@ const optionalUrl = () =>
     z.string().url().optional(),
   );
 
+const optionalCsv = () =>
+  z.preprocess(
+    (value) => {
+      if (typeof value !== "string" || value.trim() === "") {
+        return undefined;
+      }
+
+      return value
+        .split(",")
+        .map((item) => item.trim().toLowerCase())
+        .filter(Boolean);
+    },
+    z.array(z.string().email()).optional(),
+  );
+
 const envSchema = z.object({
   NEXT_PUBLIC_APP_NAME: z.string().min(1).default("VideoForge AI"),
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
@@ -43,6 +58,7 @@ const envSchema = z.object({
   OPENAI_MODEL: z.string().default("gpt-5-mini"),
   DEMO_USER_EMAIL: z.string().email().default("alex@northstarhq.com"),
   DEMO_USER_NAME: z.string().min(1).default("Alex Morgan"),
+  SUPERADMIN_EMAILS: optionalCsv().default(["profastpage@gmail.com", "alex@northstarhq.com"]),
   STRIPE_SECRET_KEY: optionalString(),
   STRIPE_WEBHOOK_SECRET: optionalString(),
   STRIPE_PRICE_DEMO: optionalString(),

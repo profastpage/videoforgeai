@@ -8,6 +8,11 @@ import {
   subscriptionSchema,
 } from "@/lib/schemas/billing";
 import { videoGenerationSchema } from "@/lib/schemas/video";
+import { env } from "@/server/env";
+
+function getRoleForEmail(email: string) {
+  return env.SUPERADMIN_EMAILS.includes(email.toLowerCase()) ? "admin" : "user";
+}
 
 export function createMockSession(input: {
   userId: string;
@@ -19,7 +24,7 @@ export function createMockSession(input: {
     user: {
       id: input.userId,
       email: input.email,
-      role: "user",
+      role: getRoleForEmail(input.email),
     },
     profile: {
       id: input.userId,

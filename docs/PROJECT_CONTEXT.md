@@ -20,6 +20,7 @@ VideoForge AI is now a cohesive SaaS base with:
 - short-form pricing plans based on 1 / 5 / 10 / 20 monthly AI videos
 - `720p`-only generation at launch to keep cost and offer scope tightly controlled
 - fal + Kling 2.5 Turbo Pro as the first live provider target, while preserving a mock fallback when no live credentials are present
+- paid live video generation currently limited to superadmin sessions only
 
 ## Main Runtime Flow
 

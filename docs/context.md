@@ -39,6 +39,7 @@ VideoForge AI is a premium AI video SaaS for marketing, sales, business teams, a
 - The generation UI and validation are currently locked to `720p` only so pricing and delivery stay aligned with the launch offer.
 - The billing page now launches live Stripe checkout for upgrades, falls back to a Stripe portal redirect for already-linked subscriptions, and reconciles successful returns server-side through the returned checkout session id.
 - The launch video provider target is fal using Kling 2.5 Turbo Pro, with automatic fallback to the mock adapter when fal credentials are missing.
+- Live Fal generation is additionally restricted to superadmin sessions so non-admin users cannot trigger paid provider runs.
 - Shared UI primitives follow shadcn/ui-style patterns and Tailwind tokens.
 
 ## Security And Validation

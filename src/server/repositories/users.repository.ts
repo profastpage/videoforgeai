@@ -1,8 +1,14 @@
 import type { PlanId } from "@/config/plans";
+import type { AuthSession } from "@/lib/schemas/auth";
 import { seededSessions } from "@/server/mock-db/users";
 import { createMockSession } from "@/server/mock-db/factories";
+import { env } from "@/server/env";
 
 const sessionStore = [...seededSessions];
+
+function getRoleForEmail(email: string): AuthSession["user"]["role"] {
+  return env.SUPERADMIN_EMAILS.includes(email.toLowerCase()) ? "admin" : "user";
+}
 
 export class UsersRepository {
   async findSessionByEmail(email: string) {
@@ -28,6 +34,7 @@ export class UsersRepository {
       (await this.findSessionByEmail(input.email));
 
     if (existing) {
+      existing.user.role = getRoleForEmail(existing.user.email);
       return existing;
     }
 
@@ -50,6 +57,17 @@ export class UsersRepository {
     }
 
     existing.planId = planId;
+    return existing;
+  }
+
+  async ensureRoleByEmail(email: string) {
+    const existing = await this.findSessionByEmail(email);
+
+    if (!existing) {
+      return null;
+    }
+
+    existing.user.role = getRoleForEmail(email);
     return existing;
   }
 }

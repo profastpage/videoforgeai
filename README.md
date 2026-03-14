@@ -95,6 +95,7 @@ npm run qa
 - Vercel is expected to stay connected to the GitHub repository so every push to `main` triggers an automatic production deployment
 - Standard release flow for this project is: local validation -> commit -> push to GitHub -> Vercel auto deploy
 - Keep secrets only in local `.env` and Vercel Environment Variables, never in Git
+- Live Fal video generation is restricted to superadmin emails configured in `SUPERADMIN_EMAILS`; non-admin sessions stay on the mock provider path
 
 AI routing:
 
@@ -112,7 +113,7 @@ Key groups:
 - App: `NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_APP_URL`
 - Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - Billing: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_DEMO`, `STRIPE_PRICE_LITE`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_BUSINESS`
-- Video provider: `VIDEO_PROVIDER`, `VIDEO_PROVIDER_API_KEY`, `VIDEO_PROVIDER_WEBHOOK_SECRET`, `FAL_API_KEY`, `FAL_QUEUE_BASE_URL`, `FAL_KLING_TEXT_MODEL`, `FAL_KLING_IMAGE_MODEL`
+- Video provider: `VIDEO_PROVIDER`, `VIDEO_PROVIDER_API_KEY`, `VIDEO_PROVIDER_WEBHOOK_SECRET`, `FAL_API_KEY`, `FAL_QUEUE_BASE_URL`, `FAL_KLING_TEXT_MODEL`, `FAL_KLING_IMAGE_MODEL`, `SUPERADMIN_EMAILS`
 - AI brief enhancement: `OPENAI_API_KEY`, `OPENAI_MODEL`
 - Storage: `STORAGE_DRIVER`, `SUPABASE_STORAGE_BUCKET`, `R2_*`
 - Jobs: `JOB_DRIVER`, `UPSTASH_REDIS_*`
