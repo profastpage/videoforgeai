@@ -1,9 +1,12 @@
+import type { StorageUploadInput, StorageUploadResult } from "@/services/storage/storage-service";
+
 export const mockStorageDriver = {
   key: "mock",
   async getPublicUrl(path: string) {
     return path;
   },
-  async upload() {
+  async upload(_input: StorageUploadInput): Promise<StorageUploadResult> {
+    void _input;
     return {
       path: "mock://uploads/demo-asset.png",
       publicUrl:

@@ -347,7 +347,7 @@ export function GenerationForm({
             {values.generationType === "image-to-video" ? (
               <UploadZone
                 selectedUrl={selectedImageUrl}
-                onSelectMock={(url) => {
+                onSelect={(url) => {
                   setSelectedImageUrl(url);
                   form.setValue("sourceImageUrl", url);
                 }}

@@ -10,6 +10,7 @@ import type { Locale } from "@/lib/i18n/messages";
 import { auditLogsRepository } from "@/server/repositories/audit-logs.repository";
 import { logger } from "@/server/logger";
 import { videoGenerationsRepository } from "@/server/repositories/video-generations.repository";
+import { env } from "@/server/env";
 import {
   assertEnoughCredits,
   consumeGenerationCredits,
@@ -17,6 +18,7 @@ import {
   refundGenerationCredits,
 } from "@/services/billing/billing-service";
 import { getVideoProvider, listVideoProviders } from "@/services/video/providers/registry";
+import { uploadToStorageFromUrl } from "@/services/storage/storage-service";
 
 function getMockAssetUrls(generation: VideoGeneration) {
   if (generation.status === "completed") {
@@ -38,6 +40,13 @@ function getMockAssetUrls(generation: VideoGeneration) {
 async function getGenerationAssetUrls(generation: VideoGeneration) {
   if (generation.providerKey === "mock" || !generation.providerJobId) {
     return getMockAssetUrls(generation);
+  }
+
+  if (generation.finalAssetUrl) {
+    return {
+      previewUrl: generation.finalAssetUrl,
+      downloadUrl: generation.finalAssetUrl,
+    };
   }
 
   if (generation.status !== "completed") {
@@ -65,6 +74,35 @@ async function getGenerationAssetUrls(generation: VideoGeneration) {
       previewUrl: null,
       downloadUrl: null,
     };
+  }
+}
+
+async function archiveCompletedRender(generation: VideoGeneration, sourceUrl: string | null) {
+  if (generation.finalAssetUrl) {
+    return generation.finalAssetUrl;
+  }
+
+  if (!sourceUrl || env.STORAGE_DRIVER !== "cloudinary") {
+    return sourceUrl;
+  }
+
+  try {
+    const archived = await uploadToStorageFromUrl({
+      sourceUrl,
+      folder: env.CLOUDINARY_RENDER_FOLDER,
+      publicId: `${generation.id}-final`,
+      resourceType: "video",
+    });
+
+    return archived.publicUrl;
+  } catch (error) {
+    logger.warn("Could not archive completed generation in Cloudinary", {
+      generationId: generation.id,
+      sourceUrl,
+      error,
+    });
+
+    return generation.finalAssetUrl ?? sourceUrl;
   }
 }
 
@@ -180,12 +218,19 @@ export async function refreshGenerationStatus(
 
   const provider = getVideoProvider(generation.providerKey);
   const providerStatus = await provider.getGenerationStatus(generation.providerJobId);
+  const resolvedFinalUrl = providerStatus.finalUrl ?? providerStatus.previewUrl ?? null;
+  const finalAssetUrl = providerStatus.status === "completed"
+    ? await archiveCompletedRender(generation, resolvedFinalUrl)
+    : null;
 
   const updatedGeneration = await videoGenerationsRepository.update(generation.id, {
     status: providerStatus.status,
     progress: providerStatus.progress,
     errorCode: providerStatus.errorCode ?? null,
     errorMessage: providerStatus.errorMessage ?? null,
+    ...(providerStatus.status === "completed" && finalAssetUrl
+      ? { finalAssetUrl }
+      : {}),
     updatedAt: new Date().toISOString(),
     completedAt:
       providerStatus.status === "completed" ? new Date().toISOString() : generation.completedAt,
@@ -212,6 +257,7 @@ export async function refreshGenerationStatus(
 
     const completedGeneration = await videoGenerationsRepository.update(updatedGeneration.id, {
       consumedCredits: updatedGeneration.estimatedCredits,
+      ...(finalAssetUrl ? { finalAssetUrl } : {}),
     });
 
     return toGenerationView(completedGeneration ?? updatedGeneration);

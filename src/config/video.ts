@@ -16,5 +16,5 @@ export const videoGenerationStatuses = [
   "failed",
   "cancelled",
 ] as const;
-export const storageDrivers = ["mock", "supabase", "r2"] as const;
+export const storageDrivers = ["mock", "supabase", "r2", "cloudinary"] as const;
 export const jobDrivers = ["mock", "upstash", "bullmq", "trigger"] as const;

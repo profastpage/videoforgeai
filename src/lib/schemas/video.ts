@@ -43,6 +43,7 @@ export const videoGenerationSchema = z.object({
   style: videoStyleSchema,
   templateSlug: z.string().min(1).nullable(),
   sourceImageUrl: z.string().url().nullable(),
+  finalAssetUrl: z.string().url().nullable().optional(),
   providerKey: z.string().min(1),
   providerJobId: z.string().min(1).nullable(),
   progress: z.number().min(0).max(100),

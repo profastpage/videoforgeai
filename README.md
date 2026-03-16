@@ -21,8 +21,8 @@ VideoForge AI is a premium SaaS foundation for creating AI videos in seconds for
 - Login and signup flows using server actions with mock auth fallback
 - Responsive dashboard shell with fixed mobile header and desktop sidebar
 - Dashboard overview with stats, video-plan state, credits and recent videos
-- Create Video flow with prompt templates, generation form, `720p`-only generation, credit estimation and mock image-to-video source
-- Create Video flow with idea-to-brief AI enhancement, editable prompt optimization, prompt templates, `720p`-only generation, credit estimation and mock image-to-video source
+- Create Video flow with prompt templates, generation form, `720p`-only generation, credit estimation and Cloudinary source upload for image-to-video
+- Create Video flow with idea-to-brief AI enhancement, editable prompt optimization, prompt templates, `720p`-only generation, credit estimation and Cloudinary-backed image source handling
 - History page with search, filters, refresh, duplicate and cancel actions
 - Billing page with operational `Demo`, `Lite`, `Pro` and `Business` video plans plus subscription summary
 - Settings page with profile, preferences and sign-out
@@ -115,7 +115,7 @@ Key groups:
 - Billing: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_DEMO`, `STRIPE_PRICE_LITE`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_BUSINESS`
 - Video provider: `VIDEO_PROVIDER`, `VIDEO_PROVIDER_API_KEY`, `VIDEO_PROVIDER_WEBHOOK_SECRET`, `FAL_API_KEY`, `FAL_QUEUE_BASE_URL`, `FAL_KLING_TEXT_MODEL`, `FAL_KLING_IMAGE_MODEL`, `SUPERADMIN_EMAILS`
 - AI brief enhancement: `OPENAI_API_KEY`, `OPENAI_MODEL`
-- Storage: `STORAGE_DRIVER`, `SUPABASE_STORAGE_BUCKET`, `R2_*`
+- Storage: `STORAGE_DRIVER`, `SUPABASE_STORAGE_BUCKET`, `R2_*`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `CLOUDINARY_UPLOAD_PRESET`, `CLOUDINARY_SOURCE_FOLDER`, `CLOUDINARY_RENDER_FOLDER`
 - Jobs: `JOB_DRIVER`, `UPSTASH_REDIS_*`
 
 ## Firebase Auth Connection
@@ -161,7 +161,16 @@ fal + Kling 2.5 Turbo Pro is now the launch target provider. To enable it:
 1. Add `FAL_API_KEY` in `.env`.
 2. Keep `VIDEO_PROVIDER=fal` or override the model ids if you want a different fal model path.
 3. The app will fall back to the mock adapter automatically if fal credentials are absent.
-4. For honest product behavior, the generation UI is now constrained to `720p` and `5s/10s`, with `10s` as the default launch format because Kling 2.5 Turbo Pro officially supports `5s` or `10s`.
+
+## Cloudinary Storage Connection
+
+1. Set `STORAGE_DRIVER=cloudinary`.
+2. Add `CLOUDINARY_CLOUD_NAME` and one of the following:
+   - `CLOUDINARY_API_KEY` + `CLOUDINARY_API_SECRET` (signed uploads), or
+   - `CLOUDINARY_UPLOAD_PRESET` for unsigned uploads.
+3. Optional: adjust `CLOUDINARY_SOURCE_FOLDER` and `CLOUDINARY_RENDER_FOLDER` to organize assets.
+4. Completed generation outputs are archived in Cloudinary via `CLOUDINARY_RENDER_FOLDER`, so preview/download URLs stay stored in the same provider.
+5. For honest product behavior, the generation UI is now constrained to `720p` and `5s/10s`, with `10s` as the default launch format because Kling 2.5 Turbo Pro officially supports `5s` or `10s`.
 
 ## Architecture Notes
 

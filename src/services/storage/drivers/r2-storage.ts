@@ -1,9 +1,12 @@
+import type { StorageUploadInput, StorageUploadResult } from "@/services/storage/storage-service";
+
 export const r2StorageDriver = {
   key: "r2",
   async getPublicUrl(path: string) {
     return path;
   },
-  async upload() {
+  async upload(_input: StorageUploadInput): Promise<StorageUploadResult> {
+    void _input;
     throw new Error("R2 driver is not configured yet.");
   },
 };
