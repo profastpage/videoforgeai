@@ -27,6 +27,49 @@ or
 
 ## Endpoints
 
+### `POST /api/video-brief/enhance`
+
+Enhances a rough idea into a structured video brief.
+
+Request:
+
+```json
+{
+  "idea": "Describe the product, the offer, the audience and the angle...",
+  "locale": "es",
+  "generationType": "text-to-video",
+  "preferredAspectRatio": "9:16",
+  "preferredDurationSeconds": 10
+}
+```
+
+Returns:
+
+```json
+{
+  "data": {
+    "brief": {
+      "projectName": "Video comercial optimizado",
+      "hook": "Gancho claro...",
+      "prompt": "Crea un video...",
+      "negativePrompt": "Evita escenas...",
+      "callToAction": "Descubre la oferta hoy",
+      "style": "performance-ads",
+      "aspectRatio": "9:16",
+      "durationSeconds": 10
+    }
+  },
+  "error": null
+}
+```
+
+Errors:
+
+- `400 INVALID_INPUT`
+- `401 UNAUTHORIZED`
+- `502 BRIEF_ENHANCEMENT_FAILED`
+- `500 INTERNAL_SERVER_ERROR`
+
 ### `GET /api/video-generations`
 
 Returns the current authenticated user generation list.

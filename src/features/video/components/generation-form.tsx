@@ -8,7 +8,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useLocale } from "@/components/providers/locale-provider";
 import { videoAspectRatios, videoDurations, videoGenerationTypes, videoResolutions, videoStyles } from "@/config/video";
-import { createVideoGenerationAction, enhanceVideoBriefAction } from "@/features/video/actions";
+import { createVideoGenerationAction } from "@/features/video/actions";
 import { CreditBadge } from "@/features/billing/components/credit-badge";
 import { PromptTemplates } from "@/features/video/components/prompt-templates";
 import { UploadZone } from "@/features/video/components/upload-zone";
@@ -109,21 +109,33 @@ export function GenerationForm({
     }
 
     startEnhancing(async () => {
-      const result = await enhanceVideoBriefAction({
-        idea,
-        locale,
-        generationType: values.generationType,
-        preferredAspectRatio: values.aspectRatio,
-        preferredDurationSeconds: values.durationSeconds,
-      });
+      try {
+        const response = await fetch("/api/video-brief/enhance", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            idea,
+            locale,
+            generationType: values.generationType,
+            preferredAspectRatio: values.aspectRatio,
+            preferredDurationSeconds: values.durationSeconds,
+          }),
+        });
 
-      if (result?.error || !result?.brief) {
-        toast.error(result?.error ?? copy.video.form.improveFailed);
-        return;
+        const payload = (await response.json()) as
+          | { data: { brief: EnhancedVideoBrief }; error: null }
+          | { data: null; error: { code: string; message: string } };
+
+        if (!response.ok || payload.error || !payload.data?.brief) {
+          toast.error(payload.error?.message ?? copy.video.form.improveFailed);
+          return;
+        }
+
+        applyEnhancedBrief(payload.data.brief);
+        toast.success(copy.video.form.briefReady);
+      } catch {
+        toast.error(copy.video.form.improveFailed);
       }
-
-      applyEnhancedBrief(result.brief);
-      toast.success(copy.video.form.briefReady);
     });
   }
 
